@@ -4,7 +4,8 @@
 
   <PropertyGroup>
     <Description>NuGet's understanding of packages. Reading nuspec, nupkgs and package signing.</Description>
-    <TargetFrameworks>net45</TargetFrameworks>
+    <TargetFrameworks>net472</TargetFrameworks>
+    <TargetFrameworks Condition="'$(BuildingInsideVisualStudio)' != 'true'">net45</TargetFrameworks>
     <TargetFramework></TargetFramework>
     <NoWarn>$(NoWarn);CS1591;CS1574;CS1573;CS1572;NU5128</NoWarn>
     <PackProject>true</PackProject>
@@ -297,8 +298,6 @@
     <Compile Include="..\NuGet.Packaging\Sha512HashFunction.cs" Link="NuGet.Packaging\Sha512HashFunction.cs" />
     <Compile Include="..\NuGet.Packaging\StringFormatter.cs" Link="NuGet.Packaging\StringFormatter.cs" />
     <Compile Include="..\NuGet.Packaging\PackageCreation\Extensions\CollectionExtensions.cs" Link="NuGet.Packaging\PackageCreation\Extensions\CollectionExtensions.cs" />
-    <Compile Include="..\NuGet.Packaging\Core\FrameworkReferenceGroup.cs" Link="NuGet.Packaging\Core\FrameworkReferenceGroup.cs" Condition="'$(TargetFramework)' == 'net472'" />
-    <Compile Include="..\NuGet.Packaging\Core\FrameworkReference.cs" Link="NuGet.Packaging\Core\FrameworkReference.cs" Condition="'$(TargetFramework)' == 'net472'" />
   </ItemGroup>
 
   <ItemGroup>
