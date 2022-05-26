@@ -450,7 +450,6 @@ namespace NuGet.Commands
         private async Task CheckVulnerabilitiesAsync(IEnumerable<SourceRepository> sourceRepos, IEnumerable<RestoreTargetGraph> graphs, ILogger logger, CancellationToken token)
         {
             List<VulnerabilityInfoResource> vulnerabilityInfoSources = new();
-
             foreach (var sourceRepo in sourceRepos)
             {
                 var resourceResult = await sourceRepo.GetResourceAsync<VulnerabilityInfoResource>();
@@ -460,16 +459,25 @@ namespace NuGet.Commands
                 }
             }
 
+            // In restore command providers cache, we can add something similar to the SourceRepositoryDependencyProvider and that can manage the vulnerabilities.
             foreach (var infoSource in vulnerabilityInfoSources)
             {
-                foreach (var package in graphs.SelectMany(e => e.Flattened).Distinct())
+                foreach (var targetGraph in graphs)
                 {
-                    if (await infoSource.IsPackageVulnerableAsync(package.Key.Name, package.Key.Version, logger, token))
+                    foreach (var graphItem in targetGraph.Flattened.OrderBy(x => x.Key))
                     {
-                        await _logger.LogAsync(RestoreLogMessage.CreateWarning(NuGetLogCode.NU1901,
-                            string.Format("The following package has a reported vulnerability '{0} {1}'", package.Key.Name, package.Key.Version)));
-                    }
+                        var package = graphItem.Key;
 
+                        if (await infoSource.IsPackageVulnerableAsync(package.Name, package.Version, logger, token))
+                        {
+                            var logMessage = RestoreLogMessage.CreateWarning(
+                                NuGetLogCode.NU1901,
+                                string.Format("Package '{0} {1}' has a reported vulnerability.", package.Name, package.Version),
+                                package.Name,
+                                targetGraph.TargetGraphName);
+                            _logger.Log(logMessage);
+                        }
+                    }
                 }
             }
         }
