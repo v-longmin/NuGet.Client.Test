@@ -147,6 +147,8 @@ namespace NuGet.ProjectModel
                     LibraryRange = new LibraryRange(packageId, range, LibraryDependencyTarget.Package)
                 };
 
+                dependency.VersionCentrallyManaged = true; // TODO: only update this when CPM is actually enabled
+
                 list.Add(dependency);
             }
 
