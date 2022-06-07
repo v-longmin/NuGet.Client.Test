@@ -45,6 +45,8 @@ namespace NuGet.ProjectModel
             PackageDependency dependency,
             IEnumerable<NuGetFramework> frameworksToAdd)
         {
+            var CPMEnabled = spec.RestoreMetadata.CentralPackageVersionsEnabled;
+
             var lists = GetDependencyLists(
                 spec,
                 includeGenericDependencies: false,
@@ -52,7 +54,7 @@ namespace NuGet.ProjectModel
 
             foreach (var list in lists)
             {
-                AddOrUpdateDependencyInDependencyList(list, dependency.Id, dependency.VersionRange);
+                AddOrUpdateDependencyInDependencyList(list, dependency.Id, dependency.VersionRange, CPMEnabled);
             }
         }
 
@@ -128,7 +130,8 @@ namespace NuGet.ProjectModel
         private static void AddOrUpdateDependencyInDependencyList(
             IList<LibraryDependency> list,
             string packageId,
-            VersionRange range)
+            VersionRange range,
+            bool CPMEnabled)
         {
 
             var dependencies = list.Where(e => StringComparer.OrdinalIgnoreCase.Equals(e.Name, packageId)).ToList();
@@ -147,7 +150,7 @@ namespace NuGet.ProjectModel
                     LibraryRange = new LibraryRange(packageId, range, LibraryDependencyTarget.Package)
                 };
 
-                dependency.VersionCentrallyManaged = true; // TODO: only update this when CPM is actually enabled
+                dependency.VersionCentrallyManaged = CPMEnabled ? true : false;
 
                 list.Add(dependency);
             }
