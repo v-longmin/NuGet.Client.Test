@@ -509,6 +509,7 @@ namespace NuGet.PackageManagement.VisualStudio
                         projectWithActions.Project.GetMetadata<string>(NuGetProjectMetadataKeys.ProjectId),
                         projectWithActions.PackageIdentity,
                         projectWithActions.NuGetProjectActionType,
+                        projectWithActions.VersionRange,
                         implicitActions: null);
 
                     _state.ResolvedActions[projectAction.Id] = resolvedAction;
@@ -663,6 +664,7 @@ namespace NuGet.PackageManagement.VisualStudio
                 projectId,
                 resolvedAction.Action.PackageIdentity,
                 resolvedAction.Action.NuGetProjectActionType,
+                resolvedAction.Action.VersionRange,
                 implicitActions);
 
             return projectAction;

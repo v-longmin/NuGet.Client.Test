@@ -1,7 +1,9 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
+using System;
 using System.Collections.Generic;
+using NuGet.Versioning;
 
 namespace NuGet.PackageManagement.UI
 {
@@ -9,7 +11,7 @@ namespace NuGet.PackageManagement.UI
     {
         public IEnumerable<AccessiblePackageIdentity> Deleted { get; }
 
-        public IEnumerable<AccessiblePackageIdentity> Added { get; }
+        public IEnumerable<Tuple<AccessiblePackageIdentity, VersionRange>> Added { get; }
 
         public IEnumerable<UpdatePreviewResult> Updated { get; }
 
@@ -17,7 +19,7 @@ namespace NuGet.PackageManagement.UI
 
         public PreviewResult(
             string projectName,
-            IEnumerable<AccessiblePackageIdentity> added,
+            IEnumerable<Tuple<AccessiblePackageIdentity, VersionRange>> added,
             IEnumerable<AccessiblePackageIdentity> deleted,
             IEnumerable<UpdatePreviewResult> updated)
         {

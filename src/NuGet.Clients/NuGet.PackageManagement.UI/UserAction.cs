@@ -61,5 +61,10 @@ namespace NuGet.PackageManagement.UI
         {
             return new UserAction(NuGetProjectActionType.Uninstall, packageId, packageVersion: null, isSolutionLevel, activeTab);
         }
+
+        public static UserAction CreateUnInstallAction(string packageId, bool isSolutionLevel, ContractsItemFilter activeTab, VersionRange versionRange)
+        {
+            return new UserAction(NuGetProjectActionType.Uninstall, packageId, packageVersion: null, isSolutionLevel, activeTab, versionRange);
+        }
     }
 }

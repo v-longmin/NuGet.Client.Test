@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -100,6 +101,77 @@ namespace NuGet.PackageManagement
             var results = updatedPackages
                 .Except(originalPackages, PackageIdentity.Comparer)
                 .ToList();
+
+            return results;
+        }
+
+        /// <summary>
+        /// Find all packages added to <paramref name="updatedLockFile"/>.
+        /// </summary>
+        public static IReadOnlyList<Tuple<PackageIdentity, VersionRange>> GetAddedPackagesWithVersionRange(
+            LockFile originalLockFile,
+            LockFile updatedLockFile)
+        {
+            IEnumerable<PackageIdentity> updatedPackages;
+            IEnumerable<Tuple<PackageIdentity, VersionRange>> updatedPackagesWithVersionRange;
+            if (updatedLockFile != null)
+            {
+                updatedPackages = updatedLockFile
+                    .Targets
+                    .SelectMany(target => target.Libraries)
+                    .Where(library => library.Type == LibraryType.Package)
+                    .Select(library => new PackageIdentity(library.Name, library.Version));
+
+                var updatedPackagesVersionRange = updatedLockFile
+                    .PackageSpec
+                    .TargetFrameworks
+                    .SelectMany(target => target.Dependencies)
+                    .Select(dependency => dependency.LibraryRange);
+
+                updatedPackagesWithVersionRange = (from Item1 in updatedPackages
+                                                   join Item2 in updatedPackagesVersionRange
+                                                   on Item1.Id equals Item2.Name
+                                                   into grouping
+                                                   from Item2 in grouping.DefaultIfEmpty()
+                                                   select Tuple.Create(Item1, Item2?.VersionRange));
+            }
+            else
+            {
+                updatedPackages = Enumerable.Empty<PackageIdentity>();
+                updatedPackagesWithVersionRange = Enumerable.Empty<Tuple<PackageIdentity, VersionRange>>();
+
+            }
+
+            IEnumerable<PackageIdentity> originalPackages;
+            IEnumerable<Tuple<PackageIdentity, VersionRange>> originalPackagesWithVersionRange;
+            if (originalLockFile != null)
+            {
+                originalPackages = originalLockFile
+                    .Targets
+                    .SelectMany(target => target.Libraries)
+                    .Where(library => library.Type == LibraryType.Package)
+                    .Select(library => new PackageIdentity(library.Name, library.Version));
+
+                var originalPackagesVersionRange = originalLockFile
+                    .PackageSpec
+                    .TargetFrameworks
+                    .SelectMany(target => target.Dependencies)
+                    .Select(dependency => dependency.LibraryRange);
+
+                originalPackagesWithVersionRange = (from Item1 in originalPackages
+                                                    join Item2 in originalPackagesVersionRange
+                                                    on Item1.Id equals Item2.Name
+                                                    into grouping
+                                                    from Item2 in grouping.DefaultIfEmpty()
+                                                    select Tuple.Create(Item1, Item2?.VersionRange));
+            }
+            else
+            {
+                originalPackages = Enumerable.Empty<PackageIdentity>();
+                originalPackagesWithVersionRange = Enumerable.Empty<Tuple<PackageIdentity, VersionRange>>();
+            }
+
+            var results = updatedPackagesWithVersionRange.Except(originalPackagesWithVersionRange).ToList();
 
             return results;
         }
