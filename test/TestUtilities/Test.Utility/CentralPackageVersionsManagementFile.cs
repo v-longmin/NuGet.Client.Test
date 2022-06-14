@@ -1,38 +1,45 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Xml.Linq;
-using NuGet.Frameworks;
+using NuGet.ProjectManagement;
 
 namespace NuGet.Test.Utility
 {
     public class CentralPackageVersionsManagementFile
     {
-        private const string Name = "Directory.Build.props";
-        private string _path;
+        private const string DirectoryPackagesProps = "Directory.Packages.props";
 
-        private Dictionary<string, string> _packageVersions;
+        private FileInfo _path;
 
-        private CentralPackageVersionsManagementFile(string path)
+        private Dictionary<string, string> _packageVersions = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        private Dictionary<string, string> _centralPackageReferences = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+        private bool _managePackageVersionsCentrally;
+
+        private CentralPackageVersionsManagementFile(string path, bool managePackageVersionsCentrally)
         {
-            _path = path;
-            _packageVersions = new Dictionary<string, string>();
+            _path = new FileInfo(Path.Combine(path, DirectoryPackagesProps));
+            _managePackageVersionsCentrally = managePackageVersionsCentrally;
         }
 
-        public static CentralPackageVersionsManagementFile Create(string path)
+        public static CentralPackageVersionsManagementFile Create(string path, bool managePackageVersionsCentrally = true)
         {
-            return new CentralPackageVersionsManagementFile(path);
+            return new CentralPackageVersionsManagementFile(path, managePackageVersionsCentrally);
         }
 
-        public CentralPackageVersionsManagementFile AddPackageVersion(string packageId, string packageVersion)
+
+        public CentralPackageVersionsManagementFile SetCentralPackageReference(string packageId, string packageVersion)
         {
-            _packageVersions.Add(packageId, packageVersion);
+            _centralPackageReferences[packageId] = packageVersion;
             return this;
         }
 
-        public CentralPackageVersionsManagementFile UpdatePackageVersion(string packageId, string packageVersion)
+        public CentralPackageVersionsManagementFile SetPackageVersion(string packageId, string packageVersion)
         {
             _packageVersions[packageId] = packageVersion;
             return this;
@@ -46,25 +53,14 @@ namespace NuGet.Test.Utility
 
         public void Save()
         {
-            XDocument cpvm = XDocument.Parse(
-                "<Project>" +
-                    "<PropertyGroup>" +
-                        "<CentralPackageVersionsFileImported>true</CentralPackageVersionsFileImported>" +
-                    "</PropertyGroup>" +
-                "</Project>");
-            NuGetFramework framework = null;
-            foreach (var pv in _packageVersions)
-            {
-                ProjectFileUtils.AddItem(cpvm, "PackageVersion", pv.Key, framework: framework, properties: new Dictionary<string, string>(), new Dictionary<string, string>() { ["Version"] = pv.Value });
-            }
+            XDocument cpvm = new XDocument(
+                new XElement("Project",
+                    new XElement("PropertyGroup",
+                        new XElement(ProjectBuildProperties.ManagePackageVersionsCentrally, new XText(_managePackageVersionsCentrally.ToString()))),
+                    new XElement("ItemGroup", _packageVersions.Select(i => new XElement("PackageVersion", new XAttribute("Include", i.Key), new XAttribute("Version", i.Value)))),
+                    new XElement("ItemGroup", _centralPackageReferences.Select(i => new XElement("CentralPackageReference", new XAttribute("Include", i.Key), new XAttribute("Version", i.Value))))));
 
-            var filePath = Path.Combine(_path, Name);
-            if (File.Exists(filePath))
-            {
-                File.Delete(filePath);
-            }
-
-            File.WriteAllText(filePath, cpvm.ToString());
+            cpvm.Save(_path.FullName);
         }
     }
 }
