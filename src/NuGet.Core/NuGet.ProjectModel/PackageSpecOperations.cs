@@ -54,12 +54,7 @@ namespace NuGet.ProjectModel
 
             foreach (var list in lists)
             {
-                AddOrUpdateDependencyInDependencyList(spec, list, dependency.Id, dependency.VersionRange);
-            }
-
-            foreach (IDictionary<string, CentralPackageVersion> centralPackageVersionList in GetCentralPackageVersionLists(spec, frameworksToAdd))
-            {
-                centralPackageVersionList[dependency.Id] = new CentralPackageVersion(dependency.Id, dependency.VersionRange);
+                AddOrUpdateDependencyInDependencyList(list, dependency.Id, dependency.VersionRange);
             }
         }
 
@@ -152,7 +147,8 @@ namespace NuGet.ProjectModel
             PackageSpec spec,
             IList<LibraryDependency> list,
             string packageId,
-            VersionRange range)
+            VersionRange range,
+            bool CPMEnabled)
         {
 
             var dependencies = list.Where(e => StringComparer.OrdinalIgnoreCase.Equals(e.Name, packageId)).ToList();
