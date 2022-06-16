@@ -1,11 +1,15 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
+<<<<<<< HEAD
 using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+=======
+using System.Windows.Controls;
+>>>>>>> 2ac31786cc92b0d57478166005fe0a87a064103d
 
 namespace NuGet.Options
 {
@@ -14,6 +18,7 @@ namespace NuGet.Options
     /// </summary>
     public partial class PackageSourceMappingOptionsControl : UserControl
     {
+<<<<<<< HEAD
         public ICommand ShowButtonCommand { get; set; }
 
         public ICommand HideButtonCommand { get; set; }
@@ -119,5 +124,11 @@ namespace NuGet.Options
             return MyPopup != null && packageList.Items.Count > 0;
         }
 
+=======
+        public PackageSourceMappingOptionsControl()
+        {
+            InitializeComponent();
+        }
+>>>>>>> 2ac31786cc92b0d57478166005fe0a87a064103d
     }
 }
