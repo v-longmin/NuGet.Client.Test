@@ -45,6 +45,9 @@ namespace NuGet.Options
         /// immediately hits enter causing the window to close without firing the combobox LostFocus event.
         /// </summary>
         /// <param name="e">Event arguments.</param>
+        ///
+
+
         protected override void OnApply(PageApplyEventArgs e)
         {
             base.OnApply(e); // Saves the user's changes.
@@ -64,6 +67,12 @@ namespace NuGet.Options
             LoadSettingsFromStorage();
 
             base.OnActivate(e);
+        }
+
+        protected override void OnClosed(EventArgs e)
+        {
+            _packageSourceMappingOptionsControl.ClearSettings();
+            base.OnClosed(e);
         }
     }
 }

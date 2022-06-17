@@ -7,11 +7,21 @@
              xmlns:vsui="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.15.0"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-<<<<<<< HEAD
-            
- <!--make new class that implements icommand-->
+
+  <!--make new class that implements icommand-->
 
   <Grid Margin="12">
+
+    <Grid.Resources>
+      <XmlDataProvider x:Key="SourcesList" XPath="Sources">
+        <x:XData>
+          <Sources xmlns="">
+            <Source name="source0"/>
+            <Source name="source1"/>
+          </Sources>
+        </x:XData>
+      </XmlDataProvider>
+    </Grid.Resources>
 
 
 
@@ -54,62 +64,62 @@
                VerticalAlignment="Center"
                AllowsTransparency="True"
                >
+      
+        <Grid  Height="168" Width="456" Background="White">
 
-      <Grid  Height="168" Width="456" Background="White">
+          <Grid.RowDefinitions>
+            <RowDefinition Height="24"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="35"/>
+          </Grid.RowDefinitions>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+          </Grid.ColumnDefinitions>
 
-        <Grid.RowDefinitions>
-          <RowDefinition Height="24"/>
-          <RowDefinition Height="*"/>
-          <RowDefinition Height="35"/>
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-          <ColumnDefinition/>
-          <ColumnDefinition/>
-        </Grid.ColumnDefinitions>
-
-        <StackPanel Grid.Row="0">
-          <Grid Name="TitleGrid"  >
-            <Grid.ColumnDefinitions>
-              <ColumnDefinition  Width="*" ></ColumnDefinition>
-              <ColumnDefinition Width="50" ></ColumnDefinition>
-            </Grid.ColumnDefinitions>
-            <TextBlock x:Uid="TitleTextBlock"
+          <StackPanel Grid.Row="0">
+            <Grid Name="TitleGrid"  >
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition  Width="*" ></ColumnDefinition>
+                <ColumnDefinition Width="50" ></ColumnDefinition>
+              </Grid.ColumnDefinitions>
+              <TextBlock x:Uid="TitleTextBlock"
                            Grid.Column="0"
                            Text="Add New Azure Cloud"
                            Margin="12,5,0,0"/>
 
 
-          </Grid>
+            </Grid>
 
 
-        </StackPanel>
+          </StackPanel>
 
-        <StackPanel Grid.Row="1">
-          <Grid>
-            <Grid.ColumnDefinitions>
-              <ColumnDefinition  Width="12" />
-              <ColumnDefinition Width="*" />
-              <ColumnDefinition  Width="12" />
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-              <RowDefinition  Height="35"/>
-              <RowDefinition  Height="*"/>
-              <RowDefinition Height="35"/>
-            </Grid.RowDefinitions>
+          <StackPanel Grid.Row="1">
+            <Grid>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition  Width="12" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition  Width="12" />
+              </Grid.ColumnDefinitions>
+              <Grid.RowDefinitions>
+                <RowDefinition  Height="35"/>
+                <RowDefinition  Height="*"/>
+                <RowDefinition Height="35"/>
+              </Grid.RowDefinitions>
 
-            <TextBox Grid.Row="0" Grid.Column="1" Name="packageID"  >
-              Add valid namespace
-            </TextBox>
+              <TextBox Grid.Row="0" Grid.Column="1" Name="packageID"  >
+                Add valid namespace
+              </TextBox>
 
 
-            <StackPanel Orientation="Vertical" Grid.Column="1" Grid.Row="1">
-              <Label Name ="Label"
+              <StackPanel Orientation="Vertical" Grid.Column="1" Grid.Row="1">
+                <Label Name ="Label"
                            Margin="0,12,0,5"
                            Padding="0"
                             Background="MistyRose" />
-              <Grid >
-                <!-- <ComboBox Name ="sources" Margin="0,0,0,9"> -->
-                <ScrollViewer VerticalScrollBarVisibility="Auto" Height="60" Visibility="Visible">
+                <Grid >
+                  <!-- <ComboBox Name ="sources" Margin="0,0,0,9"> -->
+                  <!--  <ScrollViewer VerticalScrollBarVisibility="Auto" Height="60" Visibility="Visible">
                   <ListBox Margin="0,0,0,9" SelectionMode="Multiple" Name="sourcesListBox" ItemsSource="{Binding XPath=@Names}" >
                     <ListBoxItem>Nuget</ListBoxItem>
                     <ListBoxItem>Microsoft</ListBoxItem>
@@ -118,9 +128,9 @@
                     <ListBoxItem>h</ListBoxItem>
                     <ListBoxItem>f</ListBoxItem>
                   </ListBox>
-                </ScrollViewer>
+                </ScrollViewer> -->
 
-                <!--         <ComboBox.ItemTemplate >
+                  <!--         <ComboBox.ItemTemplate >
                                         <DataTemplate>
                                                 <StackPanel Orientation="Horizontal">
                                                     <CheckBox x:Name="chkBox" Width="20"/>
@@ -128,35 +138,81 @@
                                                 </StackPanel>
                                             </DataTemplate>
                                       </ComboBox.ItemTemplate> /> -->
-                <!--    </ComboBox> -->
+                  <!--    </ComboBox> -->
+                <ListView Name="sourcesListBox" ItemsSource="{Binding SourcesCollection}" Height="60">
+                  <!--<ListView.Style>
+                    <Style TargetType="{x:Type ListView}">
+                      <Setter Property="Template">
+                        <Setter.Value>
+                          <ControlTemplate TargetType="{x:Type ListView}">
 
+                            <ScrollViewer >
 
+                            </ScrollViewer>
+                            <ControlTemplate.Triggers>
+                              <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                  <Condition Property="IsGrouping" Value="true"/>
+                                  <Condition Property="VirtualizingPanel.IsVirtualizingWhenGrouping" Value="false"/>
+                                </MultiTrigger.Conditions>
+                                <Setter Property="ScrollViewer.CanContentScroll" Value="false"/>
+                              </MultiTrigger>
+                            </ControlTemplate.Triggers>
+                          </ControlTemplate>
+                        </Setter.Value>
+                      </Setter>
+                    </Style>
+                  </ListView.Style>-->
 
+                  <ListView.View>
+                    <GridView>
+                      <!-- checkbox column -->
+                      <GridViewColumn>
+                        <GridViewColumn.Header>
+                          <GridViewColumnHeader>
+                            <CheckBox
+                  KeyboardNavigation.TabIndex="0"
+                  IsChecked="{Binding IsCheckedCommand}"/>
+                          </GridViewColumnHeader>
+                        </GridViewColumn.Header>
+
+                        <GridViewColumn.CellTemplate>
+                          <DataTemplate>
+                            <CheckBox
+                  IsTabStop="False"
+                  IsChecked="{Binding IsSelected}"/>
+                          </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                      </GridViewColumn>
+
+                      <!-- the project column -->
+                      <GridViewColumn x:Name="_projectColumn">
+                        <GridViewColumnHeader/>
+                        <GridViewColumn.CellTemplate>
+                          <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                              <TextBlock
+                                Text="{Binding}" />
+                            </StackPanel>
+                          </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                      </GridViewColumn>
+                    </GridView>
+                  </ListView.View>
+                </ListView>
               </Grid>
+              </StackPanel>
 
+              <StackPanel  Orientation="Horizontal" HorizontalAlignment="Right" Grid.Column="1" Grid.Row="2">
+                <Button Name="AddCloud" Height="23" Width="75" Content="_Add"  Command="{Binding AddButtonCommand}" />
+                <Button Name="CancelClose" Height="23" Width="75"  Command ="{Binding HideButtonCommand}">
+                  Close
+                </Button>
+              </StackPanel>
 
-            </StackPanel>
-
-
-          </Grid>
-
-        </StackPanel>
-
-        <StackPanel  Orientation="Horizontal" HorizontalAlignment="Right" Grid.Column="1" Grid.Row="2">
-          <Button Name="AddCloud" Height="23" Width="75" Content="_Add" Margin="0,0,0,12" Command="{Binding AddButtonCommand}" />
-          <Button Name="CancelClose" Height="23" Width="75" Margin="6,0,0,12" Command ="{Binding HideButtonCommand}">
-            Close
-          </Button>
-        </StackPanel>
-
-      </Grid>
-
+            </Grid>
+          </StackPanel>
+        </Grid>
     </Popup>
   </Grid>
-
-=======
-  <StackPanel>
-    <Label>Hello, World!</Label>
-  </StackPanel>
->>>>>>> 2ac31786cc92b0d57478166005fe0a87a064103d
 </UserControl>

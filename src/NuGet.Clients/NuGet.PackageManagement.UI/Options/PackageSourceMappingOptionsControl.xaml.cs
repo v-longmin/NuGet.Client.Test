@@ -3,9 +3,36 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Microsoft.VisualStudio;
+
+using System.Diagnostics;
+using System.Drawing;
+using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices;
+
+using System.Threading.Tasks;
+
+using Microsoft;
+using Microsoft.ServiceHub.Framework;
+
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
+using NuGet.Configuration;
+using NuGet.PackageManagement.UI;
+using NuGet.PackageManagement.VisualStudio;
+using NuGet.VisualStudio;
+using NuGet.VisualStudio.Common;
+using NuGet.VisualStudio.Internal.Contracts;
+using NuGet.VisualStudio.Telemetry;
+using IAsyncServiceProvider = Microsoft.VisualStudio.Shell.IAsyncServiceProvider;
+using Task = System.Threading.Tasks.Task;
 
 namespace NuGet.Options
 {
@@ -14,6 +41,12 @@ namespace NuGet.Options
     /// </summary>
     public partial class PackageSourceMappingOptionsControl : UserControl
     {
+
+        public ObservableCollection<object> SourcesCollection { get; private set; }
+
+        private IReadOnlyList<PackageSourceContextInfo> _originalPackageSources;
+
+        private INuGetSourcesService _nugetSourcesService;
 
         public ICommand ShowButtonCommand { get; set; }
 
@@ -40,11 +73,38 @@ namespace NuGet.Options
 
             ClearButtonCommand = new ClearButtonCommand(ExecuteClearButtonCommand, CanExecuteClearButtonCommand);
 
+
+            // SourcesCollection = new ObservableCollection<object>();
+
+            //SourcesCollection = ObservableCollection<PackageSourceContextInfo>;
+
+
             DataContext = this;
 
             InitializeComponent();
 
             (ShowButtonCommand as ShowButtonCommand).InvokeCanExecuteChanged();
+        }
+
+        internal async Task InitializeOnActivatedAsync(CancellationToken cancellationToken)
+        {
+            //_nugetSourcesService?.Dispose();
+            //_nugetSourcesService = null;
+
+            IServiceBrokerProvider serviceBrokerProvider = await ServiceLocator.GetComponentModelServiceAsync<IServiceBrokerProvider>();
+            IServiceBroker serviceBroker = await serviceBrokerProvider.GetAsync();
+
+            _nugetSourcesService = await serviceBroker.GetProxyAsync<INuGetSourcesService>(
+                    NuGetServices.SourceProviderService,
+                    cancellationToken: cancellationToken);
+
+
+
+            _originalPackageSources = await _nugetSourcesService.GetPackageSourcesAsync(cancellationToken);
+            var SourcesCollection = _originalPackageSources;
+
+            //_nugetSourcesService?.Dispose();
+            //_nugetSourcesService = null;
         }
 
 
@@ -118,6 +178,16 @@ namespace NuGet.Options
         private bool CanExecuteClearButtonCommand(object parameter)
         {
             return MyPopup != null && packageList.Items.Count > 0;
+        }
+
+
+        private ObservableCollection<string> Items { get; set; }
+
+        internal void ClearSettings()
+        {
+            // clear this flag so that we will set up the bindings again when the option page is activated next time
+            _nugetSourcesService?.Dispose();
+            _nugetSourcesService = null;
         }
     }
 }
