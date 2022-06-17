@@ -42,11 +42,12 @@ namespace NuGet.Options
     public partial class PackageSourceMappingOptionsControl : UserControl
     {
 
-        public ObservableCollection<object> SourcesCollection { get; private set; }
+        public ObservableCollection<PackageSourceContextInfo> SourcesCollection { get; private set; }
 
         private IReadOnlyList<PackageSourceContextInfo> _originalPackageSources;
-
+#pragma warning disable ISB001 // Dispose of proxies, disposed in disposing event or in ClearSettings
         private INuGetSourcesService _nugetSourcesService;
+#pragma warning restore ISB001 // Dispose of proxies, disposed in disposing event or in ClearSettings
 
         public ICommand ShowButtonCommand { get; set; }
 
@@ -75,10 +76,6 @@ namespace NuGet.Options
 
 
             // SourcesCollection = new ObservableCollection<object>();
-
-            //SourcesCollection = ObservableCollection<PackageSourceContextInfo>;
-
-
             DataContext = this;
 
             InitializeComponent();
@@ -94,14 +91,16 @@ namespace NuGet.Options
             IServiceBrokerProvider serviceBrokerProvider = await ServiceLocator.GetComponentModelServiceAsync<IServiceBrokerProvider>();
             IServiceBroker serviceBroker = await serviceBrokerProvider.GetAsync();
 
+#pragma warning disable ISB001 // Dispose of proxies, disposed in disposing event or in ClearSettings
             _nugetSourcesService = await serviceBroker.GetProxyAsync<INuGetSourcesService>(
                     NuGetServices.SourceProviderService,
                     cancellationToken: cancellationToken);
-
+#pragma warning restore ISB001 // Dispose of proxies, disposed in disposing event or in ClearSettings
 
 
             _originalPackageSources = await _nugetSourcesService.GetPackageSourcesAsync(cancellationToken);
-            var SourcesCollection = _originalPackageSources;
+
+            SourcesCollection = new ObservableCollection<PackageSourceContextInfo>(_originalPackageSources);
 
             //_nugetSourcesService?.Dispose();
             //_nugetSourcesService = null;

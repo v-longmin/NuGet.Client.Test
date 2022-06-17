@@ -68,11 +68,5 @@ namespace NuGet.Options
 
             base.OnActivate(e);
         }
-
-        protected override void OnClosed(EventArgs e)
-        {
-            _packageSourceMappingOptionsControl.ClearSettings();
-            base.OnClosed(e);
-        }
     }
 }
