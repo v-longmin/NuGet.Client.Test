@@ -7,10 +7,13 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using NuGet.PackageManagement.UI;
+using NuGet.VisualStudio;
 
 namespace NuGet.Options
 {
@@ -65,8 +68,19 @@ namespace NuGet.Options
             // This load call ensures we display data that was saved. This is to handle
             // the case when the user hits the cancel button and reloads the page.
             LoadSettingsFromStorage();
-
             base.OnActivate(e);
+            DoCancelableOperationWithProgressUI(() =>
+            {
+                // Normally we shouldn't wrap JTF around BrokeredCalls but this is in a cancelable operation already
+                NuGetUIThreadHelper.JoinableTaskFactory.Run(async () => await OnActivateAsync(e, CancellationToken));
+
+            }, Resources.PackageSourceOptions_OnActivated);
+        }
+
+
+        private async Task OnActivateAsync(CancelEventArgs e, CancellationToken cancellationToken)
+        {
+            await _packageSourceMappingOptionsControl.Value.InitializeOnActivatedAsync(cancellationToken);
         }
     }
 }
