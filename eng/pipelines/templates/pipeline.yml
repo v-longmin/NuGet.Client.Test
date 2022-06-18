@@ -214,6 +214,7 @@ stages:
     - Build_Insertable
     testExecutionJobTimeoutInMinutes: 100
     bootstrapperUrl: $(VsBootstrapperUrl)
+    baseVisualStudioBootstrapperURI: "https://aka.ms/vs/17/intpreview/vs_enterprise.exe"
     runSettingsURI:  https://vsdrop.corp.microsoft.com/file/v1/RunSettings/$(System.TeamProject)/$(Build.Repository.Name)/$(Build.SourceBranchName)/$(Build.BuildId);NuGet.Tests.Apex.runsettings
     DartLabEnvironment: ${{parameters.DartLabEnvironment}}
     variables:
@@ -235,6 +236,7 @@ stages:
     - Build_Insertable
     testExecutionJobTimeoutInMinutes: 100
     bootstrapperUrl: $(VsBootstrapperUrl)
+    baseVisualStudioBootstrapperURI: "https://aka.ms/vs/17/intpreview/vs_enterprise.exe"
     runSettingsURI:  https://vsdrop.corp.microsoft.com/file/v1/RunSettings/$(System.TeamProject)/$(Build.Repository.Name)/$(Build.SourceBranchName)/$(Build.BuildId);NuGet.Tests.Apex.runsettings
     DartLabEnvironment: ${{parameters.DartLabEnvironment}}
     variables:
@@ -264,4 +266,5 @@ stages:
     dartLabEnvironment: ${{parameters.DartLabEnvironment}}
     testExecutionJobTimeoutInMinutes: 150
     bootstrapperUrl: $(VsBootstrapperUrl)
+    baseVisualStudioBootstrapperURI: "https://aka.ms/vs/17/intpreview/vs_enterprise.exe"
     testMachineCleanUpStrategy: ${{parameters.ApexAgentCleanup}}
